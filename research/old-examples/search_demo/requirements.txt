@@ -4,7 +4,7 @@ langchain==0.0.244
 numpy==1.23.3
 pyserini==0.21.0
 tiktoken==0.4.0
-torch==2.0.1
+torch==2.2.0
 torch_geometric==2.3.1
 tqdm==4.65.0
 transformers==4.30.2
