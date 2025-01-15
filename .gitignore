@@ -1,4 +1,7 @@
+*.npy
 *.memmap
+miracl/miracl/*
+*.json*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
