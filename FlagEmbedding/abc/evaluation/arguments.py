@@ -107,6 +107,9 @@ class AbsEvalModelArgs:
     query_instruction_format_for_retrieval: str = field(
         default="{}{}", metadata={"help": "Format for query instruction"}
     )
+    passage_instruction_for_retrieval: Optional[str] = field(
+        default=None, metadata={"help": "Instruction for passage"}
+    )
     examples_for_task: Optional[str] = field(
         default=None, metadata={"help": "Examples for task"}
     )

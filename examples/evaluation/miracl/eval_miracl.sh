@@ -2,7 +2,10 @@ if [ -z "$HF_HUB_CACHE" ]; then
     export HF_HUB_CACHE="$HOME/.cache/huggingface/hub"
 fi
 
-dataset_names="bn hi sw te th yo"
+dataset_names="ar bn de en es fa fi fr hi id ja ko ru sw te th yo zh"
+
+VENV="/home/ubuntu/contrastors-dev/env/"
+source $VENV/bin/activate
 
 eval_args="\
     --eval_name miracl \
@@ -11,7 +14,7 @@ eval_args="\
     --splits dev \
     --corpus_embd_save_dir ./miracl/corpus_embd \
     --output_dir ./miracl/search_results \
-    --search_top_k 1000 --rerank_top_k 100 \
+    --search_top_k 1000 \
     --cache_path $HF_HUB_CACHE \
     --overwrite False \
     --k_values 10 100 \
@@ -21,14 +24,16 @@ eval_args="\
 "
 
 model_args="\
-    --embedder_name_or_path BAAI/bge-m3 \
-    --reranker_name_or_path BAAI/bge-reranker-v2-m3 \
-    --devices cuda:0 cuda:1 \
-    --cache_dir $HF_HUB_CACHE \
-    --reranker_max_length 1024 \
+    --embedder_name_or_path /home/ubuntu/contrastors-dev/src/contrastors/ckpts/nomic-multi-finetune-bge-bge-m3-filtered-data-512tokens/epoch_0_model \
+    --devices cuda:1 \
+    --trust_remote_code \
+    --query_instruction_for_retrieval 'search_query: ' \
+    --passage_instruction_for_retrieval 'search_document: ' \
+    --embedder_batch_size 32 \
+    --cache_dir $HF_HUB_CACHE 
 "
 
-cmd="python -m FlagEmbedding.evaluation.miracl \
+cmd="/home/ubuntu/contrastors-dev/env/bin/python -m FlagEmbedding.evaluation.miracl \
     $eval_args \
     $model_args \
 "

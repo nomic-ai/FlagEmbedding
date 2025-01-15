@@ -52,6 +52,7 @@ class AbsEvalRunner:
             use_fp16=model_args.use_fp16,
             query_instruction_for_retrieval=model_args.query_instruction_for_retrieval,
             query_instruction_format=model_args.query_instruction_format_for_retrieval,
+            passage_instruction_for_retrieval=model_args.passage_instruction_for_retrieval,
             devices=model_args.devices,
             examples_for_task=model_args.examples_for_task,
             examples_instruction_format=model_args.examples_instruction_format,
