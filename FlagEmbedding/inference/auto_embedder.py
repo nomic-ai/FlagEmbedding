@@ -7,6 +7,8 @@ from FlagEmbedding.inference.embedder.model_mapping import (
     AUTO_EMBEDDER_MAPPING, EMBEDDER_CLASS_MAPPING
 )
 
+from FlagEmbedding.inference.embedder.encoder_only import VoyageModel
+
 logger = logging.getLogger(__name__)
 
 
@@ -63,7 +65,12 @@ class FlagAutoModel:
         if model_name.startswith("checkpoint-"):
             model_name = os.path.basename(os.path.dirname(model_name_or_path))
 
-        if model_class is not None:
+        if "voyage" in model_name_or_path:
+            model_name = "voyage"
+            model_class = VoyageModel
+            _model_class = VoyageModel
+
+        elif model_class is not None:
             _model_class = EMBEDDER_CLASS_MAPPING[EmbedderModelClass(model_class)]
             if pooling_method is None:
                 pooling_method = _model_class.DEFAULT_POOLING_METHOD

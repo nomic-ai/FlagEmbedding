@@ -1,4 +1,5 @@
-from .encoder_only import FlagModel, BGEM3FlagModel, NomicModel
+#from .encoder_only import FlagModel, BGEM3FlagModel, NomicModel
+from .encoder_only import FlagModel, BGEM3FlagModel
 from .decoder_only import FlagICLModel, FlagLLMModel
 from .model_mapping import EmbedderModelClass
 
@@ -8,5 +9,4 @@ __all__ = [
     "FlagICLModel",
     "FlagLLMModel",
     "EmbedderModelClass",
-    "NomicModel"
 ]

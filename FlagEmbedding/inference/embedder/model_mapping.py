@@ -4,7 +4,8 @@ from dataclasses import dataclass
 from collections import OrderedDict
 
 from FlagEmbedding.abc.inference import AbsEmbedder
-from FlagEmbedding.inference.embedder import FlagModel, BGEM3FlagModel, FlagLLMModel, FlagICLModel, NomicModel
+#from FlagEmbedding.inference.embedder import FlagModel, BGEM3FlagModel, FlagLLMModel, FlagICLModel, NomicModel
+from FlagEmbedding.inference.embedder import FlagModel, BGEM3FlagModel, FlagLLMModel, FlagICLModel
 
 class EmbedderModelClass(Enum):
     ENCODER_ONLY_BASE = "encoder-only-base"
@@ -218,9 +219,9 @@ AUTO_EMBEDDER_MAPPING = OrderedDict([
         'snowflake-arctic-embed-m-v2.0',
         EmbedderConfig(FlagModel, PoolingMethod.CLS, trust_remote_code=True)
     ),
-    (
-        'nomic',
-        EmbedderConfig(NomicModel, None)
-    )
+#    (
+#        'nomic',
+#        EmbedderConfig(NomicModel, None)
+#    )
     # TODO: Add more models, such as Jina, Stella_v5, NV-Embed, etc.
 ])

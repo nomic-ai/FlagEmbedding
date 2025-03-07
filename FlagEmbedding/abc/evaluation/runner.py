@@ -62,6 +62,9 @@ class AbsEvalRunner:
             query_max_length=model_args.embedder_query_max_length,
             passage_max_length=model_args.embedder_passage_max_length,
         )
+        print(embedder)
+        print(embedder.model)
+        print(embedder.model.config)
         embedder.model.config._name_or_path = model_args.embedder_name_or_path
         reranker = None
         if model_args.reranker_name_or_path is not None:

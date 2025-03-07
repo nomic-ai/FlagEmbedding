@@ -4,7 +4,7 @@ fi
 
 dataset_names="ar bn de en es fa fi fr hi id ja ko ru sw te th yo zh"
 
-VENV="/home/ubuntu/contrastors-dev/env/"
+VENV="/home/ubuntu/bstadt-smol/flagemb/env"
 source $VENV/bin/activate
 
 eval_args="\
@@ -24,7 +24,7 @@ eval_args="\
 "
 
 model_args="\
-    --embedder_name_or_path /home/ubuntu/contrastors-dev/src/contrastors/ckpts/nomic-multi-finetune-bge-bge-m3-filtered-data-512tokens/epoch_0_model \
+    --embedder_name_or_path voyage
     --devices cuda:1 \
     --trust_remote_code \
     --query_instruction_for_retrieval 'search_query: ' \
@@ -33,7 +33,7 @@ model_args="\
     --cache_dir $HF_HUB_CACHE 
 "
 
-cmd="/home/ubuntu/contrastors-dev/env/bin/python -m FlagEmbedding.evaluation.miracl \
+cmd="/home/ubuntu/bstadt-smol/flagemb/env/bin/python -m FlagEmbedding.evaluation.miracl \
     $eval_args \
     $model_args \
 "
