@@ -20,6 +20,7 @@ def main():
         eval_args=eval_args,
         model_args=model_args
     )
+    print('running')
 
     runner.run()
 

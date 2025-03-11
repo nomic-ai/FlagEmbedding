@@ -2,9 +2,11 @@ if [ -z "$HF_HUB_CACHE" ]; then
     export HF_HUB_CACHE="$HOME/.cache/huggingface/hub"
 fi
 
-dataset_names="ar bn de en es fa fi fr hi id ja ko ru sw te th yo zh"
+#dataset_names="ar bn de en es fa fi fr hi id ja ko ru sw te th yo zh"
+#dataset_names="ar bn de en es fr ja ko ru zh"
+dataset_names="bn"
 
-VENV="/home/ubuntu/bstadt-smol/flagemb/env"
+VENV="/home/ubuntu/llama/miraclshit/env"
 source $VENV/bin/activate
 
 eval_args="\
@@ -23,9 +25,9 @@ eval_args="\
     --eval_metrics ndcg_at_10 recall_at_100 \
 "
 
+#    --devices cuda:1 \
 model_args="\
     --embedder_name_or_path voyage
-    --devices cuda:1 \
     --trust_remote_code \
     --query_instruction_for_retrieval 'search_query: ' \
     --passage_instruction_for_retrieval 'search_document: ' \
@@ -33,7 +35,7 @@ model_args="\
     --cache_dir $HF_HUB_CACHE 
 "
 
-cmd="/home/ubuntu/bstadt-smol/flagemb/env/bin/python -m FlagEmbedding.evaluation.miracl \
+cmd="/home/ubuntu/llama/miraclshit/env/bin/python -m FlagEmbedding.evaluation.miracl \
     $eval_args \
     $model_args \
 "

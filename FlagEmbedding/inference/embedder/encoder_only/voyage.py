@@ -72,6 +72,7 @@ def call_api_query(text_chunk, cache_dir="./voyage_cache"):
             if attempt == max_retries - 1:
                 print(f"Failed after {max_retries} attempts: {str(e)}")
                 raise e
+            text_chunk = text_chunk[:len(text_chunk)//2]
             time.sleep(5)
 
 def call_api_document(text_chunk, cache_dir="./voyage_cache"):
@@ -83,14 +84,13 @@ def call_api_document(text_chunk, cache_dir="./voyage_cache"):
     chunks_str = json.dumps(text_chunk, sort_keys=True)
     cache_key = hashlib.md5(chunks_str.encode()).hexdigest()
     cache_file = cache_dir / f"doc_{cache_key}.npy"
-    
+
     # Check cache first
     if cache_file.exists():
         try:
             return np.load(cache_file).tolist()
         except Exception as e:
             print(f"Failed to load cache file {cache_file}: {e}")
-    
     # If not in cache, call API
     vo = voyageai.Client(api_key=VOYAGE_API_KEY)
     max_retries = 5
@@ -105,6 +105,8 @@ def call_api_document(text_chunk, cache_dir="./voyage_cache"):
             if attempt == max_retries - 1:
                 print(f"Failed after {max_retries} attempts: {str(e)}")
                 raise e
+            print(f'Failed to embed, reducing chunk size after {attempt} retries')
+            text_chunk = text_chunk[:len(text_chunk)//2]
             time.sleep(5)
 
 
@@ -219,5 +221,6 @@ class VoyageEmbedder(AbsEmbedder):
         for result in results:
             total_encoded_queries.extend(result)
 
-        
-        return np.array(total_encoded_passages)
+        q = np.array(total_encoded_queries)
+        print('q shape: ', q.shape)
+        return q

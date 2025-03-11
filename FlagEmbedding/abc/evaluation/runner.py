@@ -27,6 +27,7 @@ class AbsEvalRunner:
         model_args: AbsEvalModelArgs,
     ):
         self.eval_args = eval_args
+        print('overwrite: ', self.eval_args.overwrite)
         self.model_args = model_args
 
         self.retriever, self.reranker = self.load_retriever_and_reranker()
@@ -168,6 +169,7 @@ class AbsEvalRunner:
                     continue
                 eval_results_path = os.path.join(reranker_search_results_save_dir, 'EVAL', "eval_results.json")
                 if os.path.exists(eval_results_path):
+                    print('loading eval rsults from: ', eval_results_path)
                     eval_results = json.load(open(eval_results_path, encoding='utf-8'))
                 else:
                     raise FileNotFoundError(f"Eval results not found: {eval_results_path}")
@@ -192,6 +194,7 @@ class AbsEvalRunner:
         else:
             dataset_names = self.data_loader.check_dataset_names(self.eval_args.dataset_names)
 
+        print('parsed dataset names: ', dataset_names)
         if len(dataset_names) == 0:
             logger.info(f"Running {self.eval_args.eval_name} evaluation on the default dataset.")
             self.evaluator(
@@ -218,8 +221,10 @@ class AbsEvalRunner:
                     k_values=self.eval_args.k_values,
                     dataset_name=dataset_name,
                 )
-            logger.info(f"{self.eval_args.eval_name} evaluation on {dataset_names} completed.")
+            #logger.info(f"{self.eval_args.eval_name} evaluation on {dataset_names} completed.")
+            print(f"{self.eval_args.eval_name} evaluation on {dataset_names} completed.")
 
+        print('running metrics')
         logger.info("Start computing metrics.")
         self.evaluate_metrics(
             search_results_save_dir=self.eval_args.output_dir,
