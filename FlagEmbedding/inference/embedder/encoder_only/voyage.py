@@ -72,7 +72,7 @@ def call_api_query(text_chunk, cache_dir="./voyage_cache"):
             if attempt == max_retries - 1:
                 print(f"Failed after {max_retries} attempts: {str(e)}")
                 raise e
-            text_chunk = text_chunk[:len(text_chunk)//2]
+            text_chunk = [t[:len(t)//2] for t in text_chunk]
             time.sleep(5)
 
 def call_api_document(text_chunk, cache_dir="./voyage_cache"):
@@ -106,7 +106,7 @@ def call_api_document(text_chunk, cache_dir="./voyage_cache"):
                 print(f"Failed after {max_retries} attempts: {str(e)}")
                 raise e
             print(f'Failed to embed, reducing chunk size after {attempt} retries')
-            text_chunk = text_chunk[:len(text_chunk)//2]
+            text_chunk = [t[:len(t)//2] for t in text_chunk]
             time.sleep(5)
 
 
