@@ -69,7 +69,7 @@ class NvidiaEmbedder(AbsEmbedder):
                     input=current_texts,
                     model=self.model_name,
                     encoding_format="float",
-                    extra_body={"input_type": input_type, "truncate": "END"}
+                    extra_body={"input_type": input_type, "truncate": "END", "dimensions": 768}
                 )
                 return np.array([data.embedding for data in response.data])
             except Exception as e:
@@ -98,7 +98,7 @@ class NvidiaEmbedder(AbsEmbedder):
     @staticmethod
     def _process_batch_static(args):
         """Static method to process a batch of passages."""
-        index, batch, model_name, base_url = args
+        batch, model_name, base_url = args
         try:
             # Create a new client for each process
             client = OpenAI(
@@ -111,13 +111,13 @@ class NvidiaEmbedder(AbsEmbedder):
                 input=batch,
                 model=model_name,
                 encoding_format="float",
-                extra_body={"input_type": "passage", "truncate": "END"}
+                extra_body={"input_type": "passage", "truncate": "END", "dimensions": 768}
             )
             embeddings = np.array([data.embedding for data in response.data])
-            return index, embeddings
+            return embeddings
         except Exception as e:
             print(f"Error processing batch {index}: {str(e)}")
-            return index, None
+            return None
 
     def encode_corpus(self, corpus: List[Dict[str, str]], batch_size: int = 128, num_processes: int = 16, **kwargs) -> np.ndarray:
         """Encode corpus passages with input_type='passage' using multiple processes."""
@@ -131,7 +131,7 @@ class NvidiaEmbedder(AbsEmbedder):
         for i in range(0, len(passages), batch_size):
             batch = passages[i:i + batch_size]
             # Include model name and base URL for each batch
-            batches.append((len(batches), batch, self.model_name, self.client.base_url))
+            batches.append((batch, self.model_name, self.client.base_url))
 
         # Process batches in parallel
         from multiprocessing import Pool
@@ -144,9 +144,8 @@ class NvidiaEmbedder(AbsEmbedder):
             ))
 
         # Sort results by index and collect embeddings
-        sorted_results = sorted(results, key=lambda x: x[0])
         all_embeddings = []
-        for _, embeddings in sorted_results:
+        for embeddings in results:
             if embeddings is not None:
                 all_embeddings.append(embeddings)
             else:
