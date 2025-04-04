@@ -4,7 +4,7 @@ fi
 
 dataset_names="ar bn de en es fa fi fr hi id ja ko ru sw te th yo zh"
 
-VENV="/home/ubuntu/bstadt-smol/flagemb/env"
+VENV="/home/ubuntu/FlagEmbedding/.venv"
 source $VENV/bin/activate
 
 eval_args="\
@@ -24,16 +24,14 @@ eval_args="\
 "
 
 model_args="\
-    --embedder_name_or_path voyage
-    --devices cuda:1 \
+    --embedder_name_or_path nvidia
+    --devices cuda:0 \
     --trust_remote_code \
-    --query_instruction_for_retrieval 'search_query: ' \
-    --passage_instruction_for_retrieval 'search_document: ' \
-    --embedder_batch_size 32 \
+    --embedder_batch_size 1024 \
     --cache_dir $HF_HUB_CACHE 
 "
 
-cmd="/home/ubuntu/bstadt-smol/flagemb/env/bin/python -m FlagEmbedding.evaluation.miracl \
+cmd="/home/ubuntu/FlagEmbedding/.venv/bin/python -m FlagEmbedding.evaluation.miracl \
     $eval_args \
     $model_args \
 "

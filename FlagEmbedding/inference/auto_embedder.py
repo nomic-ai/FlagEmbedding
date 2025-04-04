@@ -7,7 +7,7 @@ from FlagEmbedding.inference.embedder.model_mapping import (
     AUTO_EMBEDDER_MAPPING, EMBEDDER_CLASS_MAPPING
 )
 
-from FlagEmbedding.inference.embedder.encoder_only import VoyageModel
+from FlagEmbedding.inference.embedder.encoder_only import VoyageModel, NvidiaModel
 
 logger = logging.getLogger(__name__)
 
@@ -69,6 +69,11 @@ class FlagAutoModel:
             model_name = "voyage"
             model_class = VoyageModel
             _model_class = VoyageModel
+
+        elif "nvidia" in model_name_or_path:
+            model_name = "nvidia"
+            model_class = NvidiaModel
+            _model_class = NvidiaModel
 
         elif model_class is not None:
             _model_class = EMBEDDER_CLASS_MAPPING[EmbedderModelClass(model_class)]

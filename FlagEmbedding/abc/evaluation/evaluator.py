@@ -158,6 +158,7 @@ class AbsEvaluator:
 
         no_reranker_search_results_dict = {}
         if flag:
+            print(f"{retriever} is running..., loading corpus for {dataset_name}")
             corpus = self.data_loader.load_corpus(dataset_name=dataset_name)
 
             queries_dict = {
