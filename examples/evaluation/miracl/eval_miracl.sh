@@ -2,10 +2,12 @@ if [ -z "$HF_HUB_CACHE" ]; then
     export HF_HUB_CACHE="$HOME/.cache/huggingface/hub"
 fi
 
-dataset_names="ar bn de en es fa fi fr hi id ja ko ru sw te th yo zh"
+# pass in language via cli, default is all languages
+#"ar bn de en es fa fi fr hi id ja ko ru sw te th yo zh"
+#                     0 0  1  1  2  2  3   3  3 4   4  5  5 6   6  7  7
+dataset_names=(${1:-"ar bn de en es fa fi fr hi id ja ko ru sw te th yo zh"})
+device=${2:-"cuda:0 cuda:1 cuda:2 cuda:3 cuda:4 cuda:5 cuda:6 cuda:7"}
 
-VENV="/home/ubuntu/contrastors-dev/env/"
-source $VENV/bin/activate
 
 eval_args="\
     --eval_name miracl \
@@ -24,16 +26,18 @@ eval_args="\
 "
 
 model_args="\
-    --embedder_name_or_path /home/ubuntu/contrastors-dev/src/contrastors/ckpts/nomic-multi-finetune-bge-bge-m3-filtered-data-512tokens/epoch_0_model \
-    --devices cuda:1 \
+    --embedder_name_or_path nomic-ai/eurobert-210m-2e4-128sl-subset \
+    --devices $device \
     --trust_remote_code \
     --query_instruction_for_retrieval 'search_query: ' \
     --passage_instruction_for_retrieval 'search_document: ' \
-    --embedder_batch_size 32 \
+    --embedder_batch_size 512 \
+    --embedder_query_max_length 128 \
+    --embedder_passage_max_length 128 \
     --cache_dir $HF_HUB_CACHE 
 "
 
-cmd="/home/ubuntu/contrastors-dev/env/bin/python -m FlagEmbedding.evaluation.miracl \
+cmd="uv run python -W ignore -m FlagEmbedding.evaluation.miracl \
     $eval_args \
     $model_args \
 "

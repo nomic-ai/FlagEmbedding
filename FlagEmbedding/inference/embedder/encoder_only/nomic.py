@@ -28,7 +28,7 @@ def _transform_func(tokenizer,
 
 # Triton is not thread safe AFAICT so using naive DataParallel fails
 class EncoderWorker(mp.Process):
-    def __init__(self, rank, world_size, input_queue, output_queue, model_name, tokenizer_name, batch_size, master_port=12345):
+    def __init__(self, rank, world_size, input_queue, output_queue, model_name, tokenizer_name, batch_size, master_port=12344):
         super().__init__()
         self.rank = rank
         self.world_size = world_size
@@ -99,7 +99,7 @@ class EncoderWorker(mp.Process):
 
                 local_embeds = []
                 with torch.no_grad():
-                    for batch_dict in tqdm(loader, desc=f"Rank {self.rank}"):
+                    for batch_dict in tqdm(loader, desc=f"Rank {self.rank}", disable=True):
                         batch_dict = {k: v.cuda(self.rank) for k, v in batch_dict.items()}
                         with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
                             outputs = encoder(**batch_dict)
@@ -215,11 +215,15 @@ class NomicEmbedder(AbsEmbedder):
     def encode_single_device(
         self,
         sentences: Union[List[str], str],
-        batch_size: int = 256,
+        batch_size: int = 512,
         max_length: int = 512,
         convert_to_numpy: bool = True,
         device: Optional[str] = None,
     ):
+        if isinstance(sentences, str):
+            sentences = [sentences]
+        
+        # Initialize workers if not already initialized
         if len(self.workers) == 0:
             for rank in range(self.world_size):
                 worker = EncoderWorker(
@@ -234,17 +238,41 @@ class NomicEmbedder(AbsEmbedder):
                 worker.start()
                 self.workers.append(worker)
 
-        if isinstance(sentences, str):
-            sentences = [sentences]
-
-        for _ in range(self.world_size):
-            self.input_queue.put(sentences)
-        result = self.output_queue.get()
-
-        if isinstance(result, Exception):
-            raise result
-
-        return result
+        # Calculate number of batches
+        total_samples = len(sentences)
+        batch_size = 65536
+        num_batches = (total_samples + batch_size - 1) // batch_size
+        
+        all_results = []
+        
+        # Process sentences in batches
+        for batch_idx in tqdm(range(num_batches)):
+            start_idx = batch_idx * batch_size
+            end_idx = min((batch_idx + 1) * batch_size, total_samples)
+            batch_sentences = sentences[start_idx:end_idx]
+            
+            # Distribute batch to workers
+            for _ in range(self.world_size):
+                self.input_queue.put(batch_sentences)
+            
+            # Get results for this batch
+            batch_result = self.output_queue.get()
+            
+            if isinstance(batch_result, Exception):
+                raise batch_result
+            
+            all_results.append(batch_result)
+        
+        # Concatenate results from all batches
+        if len(all_results) > 1:
+            if isinstance(all_results[0], np.ndarray):
+                final_result = np.concatenate(all_results, axis=0)
+            else:  # Assuming torch.Tensor
+                final_result = torch.cat(all_results, dim=0)
+        else:
+            final_result = all_results[0]
+        
+        return final_result
 
     def __del__(self):
         # Send poison pills to workers

@@ -234,9 +234,14 @@ BCE_MAPPING = OrderedDict([
         EmbedderConfig(FlagModel, PoolingMethod.CLS, trust_remote_code=True)
     ),
     (
-        'nomic',
-        EmbedderConfig(NomicModel, None)
-    )
+        'eurobert-210m-2e4-128sl-subset',
+        EmbedderConfig(FlagModel, PoolingMethod.MEAN, trust_remote_code=True)
+    ),
+    # (
+    #     'nomic',
+    #     EmbedderConfig(NomicModel, None)
+    # )
+    # TODO: Add more models, such as Jina, Stella_v5, NV-Embed, etc.
 ])
 
 # Combine all mappings
